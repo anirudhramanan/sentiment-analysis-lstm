@@ -10,12 +10,12 @@ print('creating training csv set')
 
 header = ["file_name", "target (0: negative - 1: positive)"]
 
-training_set = open('./dataset/train/train.csv', 'w')
-test_set = open('./dataset/test/test.csv', 'w')
+training_set = open('./aclImdb/train/train.csv', 'w')
+test_set = open('./aclImdb/test/test.csv', 'w')
 
 with training_set:
-    positive_review_files = get_files('./dataset/train/pos')
-    negative_review_files = get_files('./dataset/train/neg')
+    positive_review_files = get_files('./aclImdb/train/pos')
+    negative_review_files = get_files('./aclImdb/train/neg')
     writer = csv.writer(training_set)
     writer.writerow(header)
 
@@ -26,8 +26,8 @@ with training_set:
     	writer.writerow([neg_file, 0])
 
 with test_set:
-    positive_review_files = get_files('./dataset/test/pos')
-    negative_review_files = get_files('./dataset/test/neg')
+    positive_review_files = get_files('./aclImdb/test/pos')
+    negative_review_files = get_files('./aclImdb/test/neg')
     writer = csv.writer(test_set)
     writer.writerow(["file_name"])
 
