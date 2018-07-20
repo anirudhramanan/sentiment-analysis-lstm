@@ -272,7 +272,7 @@ n_words = len(vocab_to_int) + 1 # Adding 1 because we use 0's for padding, dicti
 embedding_vecor_length = 100
 
 model = Sequential()
-model.add(Embedding(len(total_words), embedding_vecor_length, input_length=limit, dropout=0.2))
+model.add(Embedding(len(total_words), embedding_vecor_length, input_length=limit, dropout=0.25))
 model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
 model.add(MaxPooling1D(pool_size=2))
 # 1 layer of 100 units in the hidden layers of the LSTM cells
@@ -280,6 +280,5 @@ model.add(LSTM(100))
 model.add(Dense(2, activation='softmax'))
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
-y_train = np_utils.to_categorical(target[:split_index], 2)
-model.fit(x_train, y_train,epochs=5,verbose=1, batch_size=5)
+model.fit(x_train, y_train, epochs=5, verbose=1, batch_size=10)
 
