@@ -45,7 +45,7 @@ from keras.utils import np_utils
 # In[2]:
 
 
-get_ipython().magic(u"run -i 'data_download.py'")
+# get_ipython().magic(u"run -i 'data_download.py'")
 
 
 # # Data Preparation
@@ -57,7 +57,7 @@ get_ipython().magic(u"run -i 'data_download.py'")
 # In[21]:
 
 
-get_ipython().magic(u"run -i 'data_prep.py'")
+# get_ipython().magic(u"run -i 'data_prep.py'")
 
 
 # The above script will loop through all the text files present in the pos and neg directory in the training set, and will create the csv file with the filename against the sentiment. 
