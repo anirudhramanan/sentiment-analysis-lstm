@@ -45,9 +45,20 @@ with test_set:
     writer.writerow(["file_name"])
 
     for pos_file in positive_review_files:
-        writer.writerow(['pos/' + pos_file])
+        if data_limit == 0:
+            data_limit = 5000
+            break;
+        else:
+            writer.writerow(['pos/' + pos_file])
+            data_limit = data_limit - 1
+
 
     for neg_file in negative_review_files:
-        writer.writerow(['neg/' + neg_file])
+        if data_limit == 0:
+            data_limit = 5000
+            break;
+        else:
+            writer.writerow(['neg/' + neg_file])
+            data_limit = data_limit - 1
 
 print('training.csv created')
