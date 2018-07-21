@@ -13,7 +13,7 @@
 # 
 # Let's start by importing libraries that we need
 
-# In[1]:
+# In[184]:
 
 
 # ignore warnings
@@ -21,20 +21,20 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # import libraries
+import csv
 import numpy as np
 import tensorflow as tf
+from keras.utils import np_utils
+from keras.models import Sequential 
+from keras.layers import Dense 
+from keras.layers import LSTM 
+from keras.layers.embeddings import Embedding 
 from keras.preprocessing import sequence
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
-from keras.layers.embeddings import Embedding
+from keras.callbacks import TensorBoard
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras import callbacks
-from keras.models import load_model
-from keras.utils.vis_utils import plot_model
-from keras.utils import np_utils
-import csv
+
 
 # # Downloading Data
 
@@ -42,10 +42,10 @@ import csv
 # 
 # 
 
-# In[2]:
+# In[ ]:
 
 
-# get_ipython().magic(u"run -i 'data_download.py'")
+get_ipython().magic(u"run -i 'data_download.py'")
 
 
 # # Data Preparation
@@ -54,10 +54,10 @@ import csv
 # 
 # For ease of use, let's create a csv file for the train set which will contain the file name and the sentiment associated with it. 
 
-# In[21]:
+# In[155]:
 
 
-# get_ipython().magic(u"run -i 'data_prep.py'")
+get_ipython().magic(u"run -i 'data_prep.py'")
 
 
 # The above script will loop through all the text files present in the pos and neg directory in the training set, and will create the csv file with the filename against the sentiment. 
@@ -68,7 +68,7 @@ import csv
 
 # Let's print one of the reviews to understand how the dataset looks like
 
-# In[22]:
+# In[156]:
 
 
 f = open('./aclImdb/train/pos/4715_9.txt','r')
@@ -78,7 +78,7 @@ print(message)
 
 # ### Loading Data
 
-# In[8]:
+# In[157]:
 
 
 training_reviews = []
@@ -115,7 +115,7 @@ print("Test reviews: {}".format(len(test_reviews)))
 # 
 # It's input is a text corpus and its outputs a set of vectors i.e it turns text into numerical form that the neural network can understand. To create word embeddings, we will load the entire reviews (negative and positive) into a single variable, which can be then fed into the embedding layer to generate vectors.
 
-# In[9]:
+# In[158]:
 
 
 #Process the training data set, and create word arrays from the reviews
@@ -143,7 +143,7 @@ train_words = all_train_review.split()
 print(len(train_words))
 
 
-# In[10]:
+# In[159]:
 
 
 #Process the test data set, and create word arrays from the reviews
@@ -171,7 +171,7 @@ test_words = all_test_review.split()
 print(len(test_words))
 
 
-# In[11]:
+# In[160]:
 
 
 # combine the training and test words
@@ -182,7 +182,7 @@ print(len(total_words))
 
 # Now that we have the reviews, we can start creating the word embeddings. This will convert the words present in the reviews into integers which can later be fed into the neural network.
 
-# In[12]:
+# In[161]:
 
 
 from collections import Counter
@@ -201,13 +201,13 @@ for review in test_reviews:
 
 # Printing the integer mapping for the review words:
 
-# In[13]:
+# In[162]:
 
 
 train_reviews_integers[:10]
 
 
-# In[14]:
+# In[163]:
 
 
 review_lens = Counter([len(x) for x in train_reviews_integers])
@@ -217,19 +217,13 @@ print("Maximum review length: {}".format(max(review_lens)))
 
 # So, there are no zero-length reviews in our dataset. But, the maximum review length is way too much for the RNN to handle, we have to trim this down to let's say 220. For reviews longer than 220, it will be truncated to first 220 characters, and for reviews less than 220 we will add padding of 0's
 
-# In[15]:
-
-
-limit = 200
-
-
 # # Training and Validation
 
 # We will split the training set into training and validation set. The validation set is used to evaluate a given model, but this is for frequent evaluation.
 # 
 # Commonly, 80 % of the whole training data set is used for training, and rest 20 % for the validation.
 
-# In[16]:
+# In[187]:
 
 
 # use 0.2 of the data set as validation set
@@ -249,36 +243,79 @@ print(split_index)
 x_test = sequence.pad_sequences(test_reviews_integers, maxlen=limit)
 
 
-# In[17]:
+# In[166]:
 
 
 # print the shape of training set
-print(np_utils.to_categorical(target[:split_index], 2))
+print(train_x.shape)
 
 
-# In[18]:
+# In[167]:
 
 
 n_words = len(vocab_to_int) + 1 # Adding 1 because we use 0's for padding, dictionary started at 1
 
 
-# In[ ]:
+# # Building Model
+
+# Let's start by defining hyperparameters for the model
+
+# In[168]:
 
 
+# number of hidden layers in the LSTM network
+lstm_size = 256
 
-# Final Model Architecture# Final  
+# number of LSTM layers in the neural network
+lstm_layers = 1
 
-# embedding layer size
-embedding_vecor_length = 100
+# Number of data to be fed into the network during the training period. Incase of OOM, we will have to decrease
+# batch size to take in lesser number of reviews.
+batch_size = 32
 
+# embedding size
+embed_size = 300
+
+
+# Once the hyperparameters have been defined, we will build the tensorflow graph using the session api's. During the training, we might need to tune the hypermeters to get the best result/accuracy.
+
+# In[188]:
+
+
+tensorboard = TensorBoard(log_dir='./Graph', histogram_freq=0,
+                          write_graph=True, write_images=True)
+
+# create a sequential model
 model = Sequential()
-model.add(Embedding(len(total_words), embedding_vecor_length, input_length=limit, dropout=0.25))
+
+# embedding layer
+model.add(Embedding(len(total_words), embed_size, input_length=limit, dropout=0.2))
+
+# conv 1d
 model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
+
+# max pool
 model.add(MaxPooling1D(pool_size=2))
+
 # 1 layer of 100 units in the hidden layers of the LSTM cells
 model.add(LSTM(100))
+
+# dense layer
 model.add(Dense(2, activation='softmax'))
+
+#compile
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
-model.fit(x_train, y_train, epochs=5, verbose=1, batch_size=10)
+
+# train the model
+model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=10, verbose=1, batch_size=2, callbacks=[tensorboard])
+
+
+# In[189]:
+
+
+# Final evaluation of the model # Final  
+scores = model.evaluate(x_val, y_val, verbose=0) 
+
+print("Accuracy: %.2f%%" % (scores[1]*100))
 
