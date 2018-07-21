@@ -249,7 +249,7 @@ x_test = sequence.pad_sequences(test_reviews_integers, maxlen=limit)
 
 
 # print the shape of training set
-print(train_x.shape)
+print(x_train.shape)
 
 
 # In[167]:
