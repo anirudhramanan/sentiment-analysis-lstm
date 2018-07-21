@@ -217,6 +217,8 @@ print("Maximum review length: {}".format(max(review_lens)))
 
 # So, there are no zero-length reviews in our dataset. But, the maximum review length is way too much for the RNN to handle, we have to trim this down to let's say 220. For reviews longer than 220, it will be truncated to first 220 characters, and for reviews less than 220 we will add padding of 0's
 
+limit = 220
+
 # # Training and Validation
 
 # We will split the training set into training and validation set. The validation set is used to evaluate a given model, but this is for frequent evaluation.
