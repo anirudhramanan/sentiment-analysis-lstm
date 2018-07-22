@@ -13,7 +13,7 @@ header = ["file_name", "target (0: negative - 1: positive)"]
 training_set = open('./aclImdb/train/train.csv', 'w')
 test_set = open('./aclImdb/test/test.csv', 'w')
 
-data_limit = 2000
+data_limit = 1200
 
 with training_set:
     positive_review_files = get_files('./aclImdb/train/pos')
@@ -23,7 +23,7 @@ with training_set:
     
     for pos_file in positive_review_files:
         if data_limit == 0:
-            data_limit = 2000
+            data_limit = 1200
             break;
         else:
             writer.writerow([pos_file, 1])
@@ -31,7 +31,7 @@ with training_set:
 
     for neg_file in negative_review_files:
          if data_limit == 0:
-            data_limit = 2000
+            data_limit = 1200
             break
          else:
             writer.writerow([neg_file, 0])
@@ -46,7 +46,7 @@ with test_set:
 
     for pos_file in positive_review_files:
         if data_limit == 0:
-            data_limit = 2000
+            data_limit = 1200
             break;
         else:
             writer.writerow(['pos/' + pos_file])
@@ -55,7 +55,7 @@ with test_set:
 
     for neg_file in negative_review_files:
         if data_limit == 0:
-            data_limit = 2000
+            data_limit = 1200
             break;
         else:
             writer.writerow(['neg/' + neg_file])
