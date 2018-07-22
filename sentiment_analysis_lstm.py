@@ -13,7 +13,7 @@
 # 
 # Let's start by importing libraries that we need
 
-# In[184]:
+# In[22]:
 
 
 # ignore warnings
@@ -45,7 +45,7 @@ from keras import callbacks
 # In[ ]:
 
 
-get_ipython().magic(u"run -i 'data_download.py'")
+# get_ipython().magic(u"run -i 'data_download.py'")
 
 
 # # Data Preparation
@@ -54,10 +54,10 @@ get_ipython().magic(u"run -i 'data_download.py'")
 # 
 # For ease of use, let's create a csv file for the train set which will contain the file name and the sentiment associated with it. 
 
-# In[155]:
+# In[2]:
 
 
-get_ipython().magic(u"run -i 'data_prep.py'")
+# get_ipython().magic(u"run -i 'data_prep.py'")
 
 
 # The above script will loop through all the text files present in the pos and neg directory in the training set, and will create the csv file with the filename against the sentiment. 
@@ -68,7 +68,7 @@ get_ipython().magic(u"run -i 'data_prep.py'")
 
 # Let's print one of the reviews to understand how the dataset looks like
 
-# In[156]:
+# In[3]:
 
 
 f = open('./aclImdb/train/pos/4715_9.txt','r')
@@ -78,7 +78,7 @@ print(message)
 
 # ### Loading Data
 
-# In[157]:
+# In[23]:
 
 
 training_reviews = []
@@ -115,7 +115,7 @@ print("Test reviews: {}".format(len(test_reviews)))
 # 
 # It's input is a text corpus and its outputs a set of vectors i.e it turns text into numerical form that the neural network can understand. To create word embeddings, we will load the entire reviews (negative and positive) into a single variable, which can be then fed into the embedding layer to generate vectors.
 
-# In[158]:
+# In[24]:
 
 
 #Process the training data set, and create word arrays from the reviews
@@ -143,7 +143,7 @@ train_words = all_train_review.split()
 print(len(train_words))
 
 
-# In[159]:
+# In[25]:
 
 
 #Process the test data set, and create word arrays from the reviews
@@ -171,7 +171,7 @@ test_words = all_test_review.split()
 print(len(test_words))
 
 
-# In[160]:
+# In[26]:
 
 
 # combine the training and test words
@@ -182,7 +182,7 @@ print(len(total_words))
 
 # Now that we have the reviews, we can start creating the word embeddings. This will convert the words present in the reviews into integers which can later be fed into the neural network.
 
-# In[161]:
+# In[27]:
 
 
 from collections import Counter
@@ -201,13 +201,13 @@ for review in test_reviews:
 
 # Printing the integer mapping for the review words:
 
-# In[162]:
+# In[9]:
 
 
 train_reviews_integers[:10]
 
 
-# In[163]:
+# In[28]:
 
 
 review_lens = Counter([len(x) for x in train_reviews_integers])
@@ -217,7 +217,7 @@ print("Maximum review length: {}".format(max(review_lens)))
 
 # So, there are no zero-length reviews in our dataset. But, the maximum review length is way too much for the RNN to handle, we have to trim this down to let's say 220. For reviews longer than 220, it will be truncated to first 220 characters, and for reviews less than 220 we will add padding of 0's
 
-# In[ ]:
+# In[29]:
 
 
 # trim characters to first 220 characters
@@ -230,14 +230,14 @@ limit = 220
 # 
 # Commonly, 80 % of the whole training data set is used for training, and rest 20 % for the validation.
 
-# In[187]:
+# In[30]:
 
 
 # use 0.2 of the data set as validation set
 split_factor= 0.8
 split_index = int(len(train_reviews_integers)*0.8)
 
-print("Split Index : " + split_index)
+print("Split Index : " , split_index)
 
 # setup training and validation set
 x_train = sequence.pad_sequences(train_reviews_integers[:split_index], maxlen=limit)
@@ -250,7 +250,7 @@ y_val = np_utils.to_categorical(target[split_index:], 2)
 x_test = sequence.pad_sequences(test_reviews_integers, maxlen=limit)
 
 
-# In[192]:
+# In[31]:
 
 
 # print the shape of training set
@@ -261,7 +261,7 @@ print("Validation Shape : " , y_train.shape)
 print("Validation Label Shape : " , y_val.shape)
 
 
-# In[167]:
+# In[32]:
 
 
 n_words = len(vocab_to_int) + 1 # Adding 1 because we use 0's for padding, dictionary started at 1
@@ -271,7 +271,7 @@ n_words = len(vocab_to_int) + 1 # Adding 1 because we use 0's for padding, dicti
 
 # Let's start by defining hyperparameters for the model
 
-# In[168]:
+# In[33]:
 
 
 # number of hidden layers in the LSTM network
@@ -290,7 +290,7 @@ embed_size = 300
 
 # Once the hyperparameters have been defined, we will build the tensorflow graph using the session api's. During the training, we might need to tune the hypermeters to get the best result/accuracy.
 
-# In[188]:
+# In[16]:
 
 
 tensorboard = TensorBoard(log_dir='./Graph', histogram_freq=0,
@@ -305,9 +305,6 @@ model.add(Embedding(len(total_words), embed_size, input_length=limit, dropout=0.
 # conv 1d
 model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
 
-# max pool
-model.add(MaxPooling1D(pool_size=2))
-
 # 1 layer of 256 units in the hidden layers of the LSTM cells
 model.add(LSTM(lstm_size))
 
@@ -319,14 +316,37 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 print(model.summary())
 
 # train the model
-model.fit(x_train, y_train, epochs=5, verbose=1, batch_size=2, callbacks=[tensorboard])
+model.fit(x_train, y_train, epochs=5, verbose=1, batch_size=16, callbacks=[tensorboard])
 
 
-# In[189]:
+# In[ ]:
 
 
-# Final evaluation of the model # Final  
+# evaluate model on the validation set 
 scores = model.evaluate(x_val, y_val, verbose=0) 
 
 print("Accuracy: %.2f%%" % (scores[1]*100))
+
+
+# # Test
+
+# In[43]:
+
+
+from numpy import array
+
+f = open('./aclImdb/test/pos/4715_9.txt','r')
+good = f.read()
+good = re.sub('[^ a-zA-Z0-9]', '', good).lower()
+
+f = open('./aclImdb/test/neg/9487_1.txt','r')
+bad = f.read()
+bad = re.sub('[^ a-zA-Z0-9]', '', bad).lower()
+
+for review in [good, bad]:
+    tmp = []
+    for word in review.split(" "):
+        tmp.append(vocab_to_int[word])
+    tmp_padded = sequence.pad_sequences([tmp], maxlen=limit) 
+    print("%s . Sentiment: %s" % (review,model.predict(array([tmp_padded][0]))[0][0]))
 
