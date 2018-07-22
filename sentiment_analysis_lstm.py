@@ -45,7 +45,7 @@ from keras import callbacks
 # In[ ]:
 
 
-# get_ipython().magic(u"run -i 'data_download.py'")
+get_ipython().magic(u"run -i 'data_download.py'")
 
 
 # # Data Preparation
@@ -57,7 +57,7 @@ from keras import callbacks
 # In[155]:
 
 
-# get_ipython().magic(u"run -i 'data_prep.py'")
+get_ipython().magic(u"run -i 'data_prep.py'")
 
 
 # The above script will loop through all the text files present in the pos and neg directory in the training set, and will create the csv file with the filename against the sentiment. 
@@ -217,7 +217,12 @@ print("Maximum review length: {}".format(max(review_lens)))
 
 # So, there are no zero-length reviews in our dataset. But, the maximum review length is way too much for the RNN to handle, we have to trim this down to let's say 220. For reviews longer than 220, it will be truncated to first 220 characters, and for reviews less than 220 we will add padding of 0's
 
+# In[ ]:
+
+
+# trim characters to first 220 characters
 limit = 220
+
 
 # # Training and Validation
 
@@ -232,6 +237,8 @@ limit = 220
 split_factor= 0.8
 split_index = int(len(train_reviews_integers)*0.8)
 
+print("Split Index : " + split_index)
+
 # setup training and validation set
 x_train = sequence.pad_sequences(train_reviews_integers[:split_index], maxlen=limit)
 x_val = sequence.pad_sequences(train_reviews_integers[split_index:], maxlen=limit)
@@ -239,17 +246,19 @@ x_val = sequence.pad_sequences(train_reviews_integers[split_index:], maxlen=limi
 y_train = np_utils.to_categorical(target[:split_index], 2)
 y_val = np_utils.to_categorical(target[split_index:], 2)
 
-print(split_index)
-
 # setup test set
 x_test = sequence.pad_sequences(test_reviews_integers, maxlen=limit)
 
 
-# In[166]:
+# In[192]:
 
 
 # print the shape of training set
-print(x_train.shape)
+print("Training Shape : " , x_train.shape)
+print("Label Shape : " , x_val.shape)
+
+print("Validation Shape : " , y_train.shape)
+print("Validation Label Shape : " , y_val.shape)
 
 
 # In[167]:
@@ -299,8 +308,8 @@ model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
 # max pool
 model.add(MaxPooling1D(pool_size=2))
 
-# 1 layer of 100 units in the hidden layers of the LSTM cells
-model.add(LSTM(100))
+# 1 layer of 256 units in the hidden layers of the LSTM cells
+model.add(LSTM(lstm_size))
 
 # dense layer
 model.add(Dense(2, activation='softmax'))
@@ -310,7 +319,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 print(model.summary())
 
 # train the model
-model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=10, verbose=1, batch_size=2, callbacks=[tensorboard])
+model.fit(x_train, y_train, epochs=5, verbose=1, batch_size=2, callbacks=[tensorboard])
 
 
 # In[189]:
