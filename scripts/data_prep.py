@@ -28,27 +28,27 @@ with training_set:
         data_limit = data_limit - 1
 
 
-with test_set:
-    positive_review_files = get_files('./aclImdb/test/pos')
-    negative_review_files = get_files('./aclImdb/test/neg')
-    writer = csv.writer(test_set)
-    writer.writerow(["file_name"])
+# with test_set:
+#     positive_review_files = get_files('./aclImdb/test/pos')
+#     negative_review_files = get_files('./aclImdb/test/neg')
+#     writer = csv.writer(test_set)
+#     writer.writerow(["file_name"])
 
-    for pos_file in positive_review_files:
-        if data_limit == 0:
-            data_limit = 3000
-            break;
-        else:
-            writer.writerow(['pos/' + pos_file])
-            data_limit = data_limit - 1
+#     for pos_file in positive_review_files:
+#         if data_limit == 0:
+#             data_limit = 3000
+#             break;
+#         else:
+#             writer.writerow(['pos/' + pos_file])
+#             data_limit = data_limit - 1
 
 
-    for neg_file in negative_review_files:
-        if data_limit == 0:
-            data_limit = 3000
-            break;
-        else:
-            writer.writerow(['neg/' + neg_file])
-            data_limit = data_limit - 1
+#     for neg_file in negative_review_files:
+#         if data_limit == 0:
+#             data_limit = 3000
+#             break;
+#         else:
+#             writer.writerow(['neg/' + neg_file])
+#             data_limit = data_limit - 1
 
 print('training.csv created')
