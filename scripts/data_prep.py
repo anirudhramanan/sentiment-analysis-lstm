@@ -21,11 +21,11 @@ with training_set:
     
     for pos_file in positive_review_files:
         writer.writerow([pos_file, 1])
-        data_limit = data_limit - 1
+        # data_limit = data_limit - 1
 
     for neg_file in negative_review_files:
         writer.writerow([neg_file, 0])
-        data_limit = data_limit - 1
+        # data_limit = data_limit - 1
 
 
 # with test_set:
