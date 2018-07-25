@@ -184,7 +184,7 @@ print("Maximum review length: {}".format(max(review_lens)))
 
 
 # trim characters to first 220 characters
-limit = 220
+limit = 500
 
 features = np.zeros((len(reviews_ints), limit), dtype=int)
 for i, row in enumerate(reviews_ints):
@@ -259,7 +259,7 @@ lstm_layers = 1
 
 # Number of data to be fed into the network during the training period. Incase of OOM, we will have to decrease
 # batch size to take in lesser number of reviews.
-batch_size = 32
+batch_size = 250
 
 # embedding size
 embed_size = 300
