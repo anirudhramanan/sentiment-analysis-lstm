@@ -63,9 +63,9 @@ from string import punctuation
 # In[5]:
 
 
-f = open('./aclImdb/train/pos/4715_9.txt','r')
-message = f.read()
-print(message)
+# f = open('./aclImdb/train/pos/4715_9.txt','r')
+# message = f.read()
+# print(message)
 
 
 # ### Loading Data
@@ -117,11 +117,9 @@ for review in training_reviews:
     review = re.sub('[^ a-zA-Z0-9]', '', review).lower()
     processed_training_reviews.append(review)
 
-# merge all reviews
-reviews = ''
-
 all_text = ' '.join(processed_training_reviews)
 
+print(all_text[:2000])
 # split the reviews into word array
 words = all_text.split()
 
@@ -130,7 +128,7 @@ words = all_text.split()
 
 
 # print the word integer array
-words[:10]
+print(words[:100])
 
 
 # In[16]:
@@ -179,8 +177,7 @@ print("Maximum review length: {}".format(max(review_lens)))
 
 
 # trim characters to first 220 characters
-limit = 220
-
+limit = 200
 features = np.zeros((len(reviews_ints), limit), dtype=int)
 for i, row in enumerate(reviews_ints):
     features[i, -len(row):] = np.array(row)[:limit]
@@ -232,7 +229,7 @@ n_words = len(vocab_to_int) + 1
 # In[24]:
 
 
-def get_batches(x, y, batch_size=32):
+def get_batches(x, y, batch_size=100):
     n_batches = len(x)//batch_size
     x, y = x[:n_batches*batch_size], y[:n_batches*batch_size]
     for ii in range(0, len(x), batch_size):
@@ -302,14 +299,14 @@ def get_a_cell(lstm_size, keep_prob):
     return drop
 
 with graph.as_default():
-    # basic LSTM cell
-    # lstm = tf.contrib.rnn.BasicLSTMCell(lstm_size)
+    # Your basic LSTM cell
+    lstm = tf.contrib.rnn.BasicLSTMCell(lstm_size)
     
-    # dropout to the cell
-    # drop = tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob)
+    # Add dropout to the cell
+    drop = tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob)
     
     # Stack up multiple LSTM layers, for deep learning
-    cell = tf.nn.rnn_cell.MultiRNNCell([get_a_cell(lstm_size, keep_prob) for _ in range(lstm_layers)])
+    cell = tf.contrib.rnn.MultiRNNCell([drop] * lstm_layers)
     
     # Getting an initial state of all zeros
     initial_state = cell.zero_state(batch_size, tf.float32)
@@ -333,9 +330,8 @@ with graph.as_default():
 
 with graph.as_default():
     predictions = tf.contrib.layers.fully_connected(outputs[:, -1], 1, activation_fn=tf.sigmoid)
-    tf.summary.histogram('predictions', predictions)
     cost = tf.losses.mean_squared_error(labels_, predictions)
-    tf.summary.scalar('cost', cost)
+    
     optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 
@@ -365,9 +361,6 @@ with graph.as_default():
 
 with tf.Session(graph=graph) as sess:
     sess.run(tf.global_variables_initializer())
-    merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter('./logs/tb/train', sess.graph)
-    test_writer = tf.summary.FileWriter('./logs/tb/test', sess.graph)
     iteration = 1
     for e in range(epochs):
         state = sess.run(initial_state)
@@ -377,9 +370,7 @@ with tf.Session(graph=graph) as sess:
                     labels_: y[:, None],
                     keep_prob: 0.5,
                     initial_state: state}
-            summary, loss, state, _ = sess.run([merged, cost, final_state, optimizer], feed_dict=feed)
-            train_writer.add_summary(summary, iteration)
-#             loss, state, _ = sess.run([cost, final_state, optimizer], feed_dict=feed)
+            loss, state, _ = sess.run([cost, final_state, optimizer], feed_dict=feed)
             
             if iteration%5==0:
                 print("Epoch: {}/{}".format(e, epochs),
@@ -394,8 +385,7 @@ with tf.Session(graph=graph) as sess:
                             labels_: y[:, None],
                             keep_prob: 1,
                             initial_state: val_state}
-#                     batch_acc, val_state = sess.run([accuracy, final_state], feed_dict=feed)
-                    summary, batch_acc, val_state = sess.run([merged, accuracy, final_state], feed_dict=feed)
+                    batch_acc, val_state = sess.run([accuracy, final_state], feed_dict=feed)
                     val_acc.append(batch_acc)
                 print("Val acc: {:.3f}".format(np.mean(val_acc)))
             iteration +=1
