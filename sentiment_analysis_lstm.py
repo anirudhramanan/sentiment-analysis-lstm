@@ -184,7 +184,7 @@ print("Maximum review length: {}".format(max(review_lens)))
 
 
 # trim characters to first 220 characters
-limit = 200
+limit = 300
 
 features = np.zeros((len(reviews_ints), limit), dtype=int)
 for i, row in enumerate(reviews_ints):
@@ -255,7 +255,7 @@ def get_batches(x, y, batch_size=32):
 lstm_size = 256
 
 # number of LSTM layers in the neural network
-lstm_layers = 1
+lstm_layers = 2
 
 # Number of data to be fed into the network during the training period. Incase of OOM, we will have to decrease
 # batch size to take in lesser number of reviews.
@@ -301,16 +301,20 @@ with graph.as_default():
 
 # In[28]:
 
+def get_a_cell(lstm_size, keep_prob):
+    lstm = tf.nn.rnn_cell.BasicLSTMCell(lstm_size)
+    drop = tf.nn.rnn_cell.DropoutWrapper(lstm, output_keep_prob=keep_prob)
+    return drop
 
 with graph.as_default():
     # basic LSTM cell
-    lstm = tf.contrib.rnn.BasicLSTMCell(lstm_size)
+    # lstm = tf.contrib.rnn.BasicLSTMCell(lstm_size)
     
     # dropout to the cell
-    drop = tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob)
+    # drop = tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob)
     
     # Stack up multiple LSTM layers, for deep learning
-    cell = tf.contrib.rnn.MultiRNNCell([drop] * lstm_layers)
+    cell = tf.nn.rnn_cell.MultiRNNCell([get_a_cell(lstm_size, keep_prob) for _ in range(lstm_layers)])
     
     # Getting an initial state of all zeros
     initial_state = cell.zero_state(batch_size, tf.float32)
@@ -376,7 +380,7 @@ with tf.Session(graph=graph) as sess:
         for ii, (x, y) in enumerate(get_batches(train_x, train_y, batch_size), 1):
             feed = {inputs_: x,
                     labels_: y[:, None],
-                    keep_prob: 0.5,
+                    keep_prob: 0.8,
                     initial_state: state}
             summary, loss, state, _ = sess.run([merged, cost, final_state, optimizer], feed_dict=feed)
             train_writer.add_summary(summary, iteration)
@@ -393,7 +397,7 @@ with tf.Session(graph=graph) as sess:
                 for x, y in get_batches(val_x, val_y, batch_size):
                     feed = {inputs_: x,
                             labels_: y[:, None],
-                            keep_prob: 1,
+                            keep_prob: 0.8,
                             initial_state: val_state}
 #                     batch_acc, val_state = sess.run([accuracy, final_state], feed_dict=feed)
                     summary, batch_acc, val_state = sess.run([merged, accuracy, final_state], feed_dict=feed)
