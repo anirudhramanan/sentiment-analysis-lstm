@@ -251,7 +251,7 @@ lstm_layers = 1
 
 # Number of data to be fed into the network during the training period. Incase of OOM, we will have to decrease
 # batch size to take in lesser number of reviews.
-batch_size = 500
+batch_size = 250
 
 # embedding size
 embed_size = 300
@@ -354,7 +354,7 @@ with graph.as_default():
 # In[32]:
 
 
-epochs = 30
+epochs = 100
 
 with graph.as_default():
     saver = tf.train.Saver()
@@ -368,7 +368,7 @@ with tf.Session(graph=graph) as sess:
         for ii, (x, y) in enumerate(get_batches(train_x, train_y, batch_size), 1):
             feed = {inputs_: x,
                     labels_: y[:, None],
-                    keep_prob: 0.5,
+                    keep_prob: 0.8,
                     initial_state: state}
             loss, state, _ = sess.run([cost, final_state, optimizer], feed_dict=feed)
             
