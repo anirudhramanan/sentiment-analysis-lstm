@@ -128,7 +128,7 @@ for review in processed_training_reviews:
 all_text = ' '.join(reviews)
 
 # split the reviews into word array
-words = reviews.split()
+words = all_text.split()
 
 
 # In[15]:
@@ -184,7 +184,7 @@ print("Maximum review length: {}".format(max(review_lens)))
 
 
 # trim characters to first 220 characters
-limit = 300
+limit = 220
 
 features = np.zeros((len(reviews_ints), limit), dtype=int)
 for i, row in enumerate(reviews_ints):
@@ -255,7 +255,7 @@ def get_batches(x, y, batch_size=32):
 lstm_size = 256
 
 # number of LSTM layers in the neural network
-lstm_layers = 2
+lstm_layers = 1
 
 # Number of data to be fed into the network during the training period. Incase of OOM, we will have to decrease
 # batch size to take in lesser number of reviews.
@@ -380,7 +380,7 @@ with tf.Session(graph=graph) as sess:
         for ii, (x, y) in enumerate(get_batches(train_x, train_y, batch_size), 1):
             feed = {inputs_: x,
                     labels_: y[:, None],
-                    keep_prob: 0.8,
+                    keep_prob: 0.5,
                     initial_state: state}
             summary, loss, state, _ = sess.run([merged, cost, final_state, optimizer], feed_dict=feed)
             train_writer.add_summary(summary, iteration)
@@ -397,7 +397,7 @@ with tf.Session(graph=graph) as sess:
                 for x, y in get_batches(val_x, val_y, batch_size):
                     feed = {inputs_: x,
                             labels_: y[:, None],
-                            keep_prob: 0.8,
+                            keep_prob: 1,
                             initial_state: val_state}
 #                     batch_acc, val_state = sess.run([accuracy, final_state], feed_dict=feed)
                     summary, batch_acc, val_state = sess.run([merged, accuracy, final_state], feed_dict=feed)
