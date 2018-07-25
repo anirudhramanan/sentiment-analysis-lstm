@@ -354,7 +354,7 @@ with graph.as_default():
 # In[32]:
 
 
-epochs = 10
+epochs = 30
 
 with graph.as_default():
     saver = tf.train.Saver()
