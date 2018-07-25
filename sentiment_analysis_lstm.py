@@ -116,16 +116,11 @@ for review in training_reviews:
     # remove special characteres.
     review = re.sub('[^ a-zA-Z0-9]', '', review).lower()
     processed_training_reviews.append(review)
-    
-all_text = ''.join([c for c in training_reviews if c not in punctuation])
 
 # merge all reviews
 reviews = ''
 
-for review in processed_training_reviews:
-    reviews += ' ' + review
-
-all_text = ' '.join(reviews)
+all_text = ' '.join(processed_training_reviews)
 
 # split the reviews into word array
 words = all_text.split()
