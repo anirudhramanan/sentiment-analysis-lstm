@@ -16,13 +16,21 @@ The dataset contains movie reviews along with their associated binary sentiment 
 
 You can run the `data_prep.py` script in the scripts directory to preprocess the data set.
 
-# LSTM Graph 
+## LSTM Graph 
 
-# Requirements
+![LSTM Graph](https://github.com/anirudhramanan/sentiment-analysis-lstm/blob/master/images/lstm_graph.png)
+
+## Validation Accuracy
+
+![LSTM Graph](https://github.com/anirudhramanan/sentiment-analysis-lstm/blob/master/images/validation_acc.png)
+
+[Final Report](https://github.com/anirudhramanan/sentiment-analysis-lstm/blob/master/report/Sentiment%20Analysis%20Report.pdf)
+
+## Requirements
 
 In order to run [the iPython notebook](Oriole-LSTM.ipynb), you'll need the following libraries.
 
-* **[TensorFlow](https://www.tensorflow.org/install/)
-* **[[NumPy](https://docs.scipy.org/doc/numpy/user/install.html)
-* **[[Jupyter](https://jupyter.readthedocs.io/en/latest/install.html)
-* **[[matplotlib](https://matplotlib.org/)
+* [TensorFlow](https://www.tensorflow.org/install/)
+* [NumPy](https://docs.scipy.org/doc/numpy/user/install.html)
+* [Jupyter](https://jupyter.readthedocs.io/en/latest/install.html)
+* [matplotlib](https://matplotlib.org/)
