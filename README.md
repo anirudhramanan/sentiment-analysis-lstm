@@ -4,6 +4,8 @@ Sentiment Analysis is a process of determining whether a given statement is posi
 
 [Proposal Report](https://github.com/anirudhramanan/sentiment-analysis-lstm/blob/master/Sentiment%20Analysis%20Proposal.pdf)
 
+[Final Report](https://github.com/anirudhramanan/sentiment-analysis-lstm/blob/master/report/Sentiment%20Analysis%20Report.pdf)
+
 ## Downloading Data-set
 
 The dataset has been downloaded from http://ai.stanford.edu website. This dataset contains movie reviews along with their associated binary sentiment labels. The core dataset contains 50,000 reviews (25K positive and 25K negative, balanced distribution) split evenly into 25K training and 25K test sets. 
@@ -22,9 +24,9 @@ You can run the `data_prep.py` script in the scripts directory to preprocess the
 
 ## Validation Accuracy
 
-![LSTM Graph](https://github.com/anirudhramanan/sentiment-analysis-lstm/blob/master/images/validation_acc.png)
+Validation test ie (0.15% of the training set) contains 3125 reviews. The validation set has an accuracy of 0.840 using the above trained model.
 
-[Final Report](https://github.com/anirudhramanan/sentiment-analysis-lstm/blob/master/report/Sentiment%20Analysis%20Report.pdf)
+![LSTM Graph](https://github.com/anirudhramanan/sentiment-analysis-lstm/blob/master/images/validation_acc.png)
 
 ## Requirements
 
